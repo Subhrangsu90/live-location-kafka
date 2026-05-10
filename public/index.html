@@ -1,0 +1,69 @@
+<!doctype html>
+<html lang="en">
+	<head>
+		<meta charset="UTF-8" />
+		<meta
+			name="viewport"
+			content="width=device-width, initial-scale=1.0" />
+		<title>Live Location Track - Kafka Demo</title>
+		<link
+			rel="stylesheet"
+			href="base.css" />
+		<link
+			rel="stylesheet"
+			href="style.css" />
+		<link
+			rel="stylesheet"
+			href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+			integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY="
+			crossorigin="" />
+	</head>
+	<body>
+		<h1>Live Location Tracker</h1>
+		<div id="map"></div>
+		<script
+			src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
+			integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo="
+			crossorigin=""></script>
+		<script>
+			// Initialize and display a map
+			const map = L.map("map").setView([51.505, -0.09], 13);
+			L.tileLayer("https://tile.openstreetmap.org/{z}/{x}/{y}.png", {
+				maxZoom: 19,
+				attribution:
+					'&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>',
+			}).addTo(map);
+
+			// Get user current location
+			function getUserCurrentLocation() {
+				return new Promise((resolve, reject) => {
+					if ("geolocation" in navigator) {
+						navigator.geolocation.getCurrentPosition(
+							(position) => {
+								const latitude = position.coords.latitude;
+								const longitude = position.coords.longitude;
+								resolve({ latitude, longitude });
+							},
+							(error) => {
+								reject(error);
+							},
+							{ enableHighAccuracy: true },
+						);
+					} else {
+						console.log(
+							"Geolocation is not supported by this browser.",
+						);
+					}
+				});
+			}
+			getUserCurrentLocation().then((position) => {
+				const marker = L.marker([
+					position.latitude,
+					position.longitude,
+				]).addTo(map);
+
+				console.log(position);
+			});
+		</script>
+	</body>
+</html>
