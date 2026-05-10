@@ -6,7 +6,6 @@ import {
 	logoutUser,
 	registerUser,
 } from "./auth.controller.js";
-import { requireAuth } from "./auth.middleware.js";
 
 const router = Router();
 

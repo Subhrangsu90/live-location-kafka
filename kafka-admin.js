@@ -1,4 +1,5 @@
 import { kafkaClient } from "./kafka-client.js";
+import { LOCATION_TOPIC } from "./src/app/location/location.constants.js";
 
 async function setupKafka() {
 	const admin = kafkaClient.admin();
@@ -8,7 +9,7 @@ async function setupKafka() {
 	console.log(`Kafka Admin Connected`);
 
 	await admin.createTopics({
-		topics: [{ topic: "location-update", numPartitions: 2 }],
+		topics: [{ topic: LOCATION_TOPIC, numPartitions: 2 }],
 	});
 
 	await admin.disconnect();

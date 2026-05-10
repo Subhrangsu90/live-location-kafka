@@ -63,7 +63,7 @@ const handleCallback = async (req, res) => {
 
 		authService.clearCookie(res, req, authService.STATE_COOKIE_NAME);
 
-		return res.redirect("/chat");
+		return res.redirect("/");
 	} catch (error) {
 		console.error("OIDC callback failed", error);
 		return res.status(500).send("Unable to complete login.");

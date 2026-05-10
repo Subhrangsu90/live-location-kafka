@@ -4,7 +4,15 @@ import path from "node:path";
 import express from "express";
 import { Server } from "socket.io";
 
-import { kafkaClient } from "./kafka-client.js";
+import authRoutes from "./src/app/auth/auth.routes.js";
+import {
+	createLocationConsumer,
+	createLocationProducer,
+} from "./src/app/location/location.service.js";
+import {
+	registerLocationSocketHandlers,
+	startLocationBroadcasts,
+} from "./src/app/location/location.socket.js";
 
 async function main() {
 	const PORT = process.env.PORT ?? 8000;
@@ -14,59 +22,16 @@ async function main() {
 
 	const io = new Server();
 
-	const kafkaProducer = kafkaClient.producer();
+	const kafkaProducer = createLocationProducer();
 	await kafkaProducer.connect();
 
-	const kafkaConsumer = kafkaClient.consumer({
-		groupId: `socket-server-${PORT}`,
-	});
+	const kafkaConsumer = createLocationConsumer(`socket-server-${PORT}`);
 	await kafkaConsumer.connect();
 
-	await kafkaConsumer.subscribe({
-		topic: "location-updates",
-		fromBeginning: true,
-	});
-
-	await kafkaConsumer.run({
-		eachMessage: async ({ topic, partition, message, heartbeat }) => {
-			const data = JSON.parse(message.value.toString());
-			console.log(`KafkaConsumer Data Recived`, { data });
-			io.emit("server:location:update", {
-				id: data.id,
-				latitude: data.latitude,
-				longitude: data.longitude,
-			});
-			await heartbeat();
-		},
-	});
+	await startLocationBroadcasts(io, kafkaConsumer);
 
 	io.attach(server);
-
-	io.on("connection", (socket) => {
-		console.log(`[Socket: ${socket.id}: Connected Successfully]`);
-
-		socket.on("client:location:update", async (locationData) => {
-			console.log(locationData);
-			const { latitude, longitude } = locationData;
-			console.log(
-				`[Socket: ${socket.id}: Location Updated: ${latitude}, ${longitude}]`,
-			);
-
-			await kafkaProducer.send({
-				topic: "location-updates",
-				messages: [
-					{
-						key: socket.id,
-						value: JSON.stringify({
-							id: socket.id,
-							latitude,
-							longitude,
-						}),
-					},
-				],
-			});
-		});
-	});
+	registerLocationSocketHandlers(io, kafkaProducer);
 
 	app.get("/health", (req, res) => {
 		return res.json({
@@ -74,6 +39,7 @@ async function main() {
 		});
 	});
 
+	app.use("/auth", authRoutes);
 	app.use(express.static(path.resolve("./public")));
 
 	server.listen(PORT, () => {

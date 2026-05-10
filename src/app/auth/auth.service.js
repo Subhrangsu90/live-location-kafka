@@ -1,8 +1,7 @@
-import "dotenv/config";
 import crypto from "node:crypto";
 
-const AUTH_COOKIE_NAME = "chat_auth_token";
-const STATE_COOKIE_NAME = "chat_auth_state";
+const AUTH_COOKIE_NAME = "location_auth_token";
+const STATE_COOKIE_NAME = "location_auth_state";
 const COOKIE_MAX_AGE_SECONDS = 60 * 60;
 let discoveryCache;
 

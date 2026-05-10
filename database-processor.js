@@ -1,22 +1,14 @@
-import { kafkaClient } from "./kafka-client.js";
+import {
+	createLocationConsumer,
+	subscribeToLocationUpdates,
+} from "./src/app/location/location.service.js";
 
-async function init(params) {
-	const kafkaConsumer = kafkaClient.consumer({
-		groupId: `database-processor`,
-	});
+async function init() {
+	const kafkaConsumer = createLocationConsumer("database-processor");
 	await kafkaConsumer.connect();
 
-	await kafkaConsumer.subscribe({
-		topic: "location-updates",
-		fromBeginning: true,
-	});
-
-	await kafkaConsumer.run({
-		eachMessage: async ({ topic, partition, message, heartbeat }) => {
-			const data = JSON.parse(message.value.toString());
-			console.log(`INSERT INTO DB LOCATION`, data);
-			await heartbeat();
-		},
+	await subscribeToLocationUpdates(kafkaConsumer, async (locationUpdate) => {
+		console.log("INSERT INTO DB LOCATION", locationUpdate);
 	});
 }
 
