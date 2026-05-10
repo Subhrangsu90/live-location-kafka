@@ -1,3 +1,4 @@
+import "dotenv/config";
 import http from "node:http";
 import path from "node:path";
 
@@ -15,7 +16,7 @@ import {
 } from "./src/app/location/location.socket.js";
 
 async function main() {
-	const PORT = process.env.PORT ?? 8000;
+	const PORT = process.env.PORT ?? 9000;
 
 	const app = express();
 	const server = http.createServer(app);

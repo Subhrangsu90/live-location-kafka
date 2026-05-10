@@ -12,12 +12,14 @@ function createLocationConsumer(groupId) {
 function normalizeLocationUpdate(id, locationData) {
 	const latitude = Number(locationData?.latitude);
 	const longitude = Number(locationData?.longitude);
+	const name = locationData?.name;
+	const sub = locationData?.sub;
 
 	if (!Number.isFinite(latitude) || !Number.isFinite(longitude)) {
 		throw new Error("Location update requires latitude and longitude.");
 	}
 
-	return { id, latitude, longitude };
+	return { id, latitude, longitude, name, sub };
 }
 
 async function publishLocationUpdate(producer, locationUpdate) {

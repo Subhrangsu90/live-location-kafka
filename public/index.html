@@ -19,8 +19,75 @@
 			crossorigin="" />
 	</head>
 	<body>
-		<h1>Live Location Tracker</h1>
-		<div id="map"></div>
+		<div class="app-shell">
+			<header class="app-header">
+				<div>
+					<p class="eyebrow">Kafka live stream</p>
+					<h1>Live Location Tracker</h1>
+				</div>
+
+				<nav
+					class="auth-actions"
+					aria-label="Authentication actions">
+					<span
+						class="auth-status auth-user"
+						id="authStatus"
+						hidden>Guest mode</span>
+					<a
+						class="button secondary auth-guest"
+						href="/auth/login">Login</a>
+					<a
+						class="button primary auth-guest"
+						href="/auth/register">Register</a>
+					<button
+						class="button danger auth-user"
+						id="logoutButton"
+						type="button"
+						hidden>Logout</button>
+				</nav>
+			</header>
+
+			<main class="tracker-layout">
+				<section
+					class="map-panel"
+					aria-label="Live location map">
+					<div id="map"></div>
+				</section>
+
+				<aside
+					class="tracker-panel"
+					aria-label="Tracker status">
+					<div class="status-group">
+						<p class="panel-label">Tracker</p>
+						<h2 id="trackerStatus">Waiting for location</h2>
+						<p id="trackerDetail">
+							Allow location access to start broadcasting.
+						</p>
+					</div>
+
+					<div class="metric-grid">
+						<div class="metric">
+							<span class="metric-label">Peers</span>
+							<strong id="peerCount">0</strong>
+						</div>
+						<div class="metric">
+							<span class="metric-label">Last ping</span>
+							<strong id="lastPing">--</strong>
+						</div>
+					</div>
+
+					<div class="location-card">
+						<span class="metric-label">Your coordinates</span>
+						<p id="myCoordinates">Not shared yet</p>
+					</div>
+
+					<!-- AUTH: If login is required, disable location sharing until /auth/me returns authenticated: true. -->
+					<p class="auth-note">
+						Login can be required before sharing location.
+					</p>
+				</aside>
+			</main>
+		</div>
 		<script
 			src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
 			integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo="
